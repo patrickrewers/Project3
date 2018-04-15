@@ -1,0 +1,10 @@
+BigMac,20
+T.J.,22
+BigMac,27
+Hammer Down,31
+Pat,18
+Patrick,24
+Kenny,20
+Pat,24
+Pat,40
+Lydia,18
