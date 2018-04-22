@@ -9,7 +9,7 @@
 
 # Import Graphics library
 from graphics import Point, Rectangle, GraphWin, Line, Entry, Text
-from random import random
+from random import random, randint
 
 # ==================================[ MAIN }===================================
 
@@ -50,7 +50,7 @@ def main():
                     in_game = True
                     player_name_display, player_name, reset_button, reset_text, current_score_text, current_score_display, phase = drawInGamePanel(
                         new_player_text, player_name_entry, game_panel, score)
-                    field, pete, sensors = drawFieldPanel()
+                    field, pete, sensors, spin_square = drawFieldPanel()
                 # Clicks while in game close the game and revert panel to New
                 #   Player panel
                 elif phase == "in_game":
@@ -68,12 +68,12 @@ def main():
                 field.close()
                 score = 0
                 current_score_text, current_score_display = updateScore(current_score_text, current_score_display, game_panel, score)
-                field, pete, sensors = drawFieldPanel()
+                field, pete, sensors, spin_square = drawFieldPanel()
 
         # Check if user clicked in field panel
         if panel == "field":
             # Move pete based on click
-            pete, pete_center, score = movePete(pete, field, x, y, score, sensors)
+            pete, pete_center, score = movePete(pete, field, x, y, score, sensors, spin_square)
             # Update score with every click during game
             if phase == "in_game":
                 current_score_text, current_score_display = updateScore(
@@ -121,8 +121,6 @@ def drawGamePanel():
     return game_panel
 
 # Define drawScoreDisplay() function
-
-
 def drawScoreDisplay(game_panel):
 
     # Draws box that serves as the background the score displays
@@ -390,6 +388,15 @@ def drawFieldPanel():
     end.setFill("red")
     end.setOutline("light gray")
     end.draw(field)
+    # Create spin square Rectangle
+    spin_x = randint(1, 10) * 40 - 20
+    spin_y = randint(1, 10) * 40 - 20
+    spin_square = Rectangle(Point(spin_x-17, spin_y-17), Point(spin_x+17, spin_y+17))
+    spin_square.setFill("blue")
+    spin_square.draw(field)
+    spin_text = Text(Point(spin_x, spin_y), "SPIN")
+    spin_text.setTextColor("white")
+    spin_text.draw(field)
     # Create initial Pete Rectangle
     pete = Rectangle(Point(4, 4), Point(36, 36))
     pete.setFill("gold")
@@ -397,7 +404,7 @@ def drawFieldPanel():
     # Draw and return sensors
     sensors = drawSensors(field)
     # Return objects
-    return field, pete, sensors
+    return field, pete, sensors, spin_square
 
 # ================================[ CLICK }====================================
 
@@ -490,74 +497,80 @@ def checkWinGame(pete_center):
     else:
         return False
 
+# Check edges
+
+def checkLeft(pete_center):
+    peteX, peteY = clickCoords(pete_center)
+    if peteX - 20 == 0:
+        return True
+    else:
+        return False
+
+
+def checkUp(pete_center):
+    peteX, peteY = clickCoords(pete_center)
+    if peteY - 20 == 0:
+        return True
+    else:
+        return False
+
+
+def checkRight(pete_center):
+    peteX, peteY = clickCoords(pete_center)
+    if peteX + 20 == 400:
+        return True
+    else:
+        return False
+
+
+def checkDown(pete_center):
+    peteX, peteY = clickCoords(pete_center)
+    if peteY + 20 == 400:
+        return True
+    else:
+        return False
+
 # ===========================[ FIELD METHODS ]=================================
 
 # Define movePete() function
 
 
-def movePete(pete, field, x, y, score, sensors):
+def movePete(pete, field, x, y, score, sensors, spin_square):
     # Find the location of Pete, and derive the edges
     pete_center = pete.getCenter()
     clickX = x
     clickY = y
     peteX, peteY = clickCoords(pete_center)
+    spinX, spinY = clickCoords(spin_square.getCenter())
     peteUpperX = peteX+20
     peteLowerX = peteX-20
     peteUpperY = peteY+20
     peteLowerY = peteY-20
     # Undraw Pete object so it can be re-drawn
     pete.undraw()
-    # Move down
-    #   If user clicks below Pete in the same column, move Pete down one square
-    if clickX >= peteLowerX and clickX <= peteUpperX and clickY > peteUpperY:
-        peteY += 40
-        # If Pete crossed a sensor border, add a penalty of 2
-        for coordinate in sensors:
-            if peteX == coordinate[0] and (peteY-20) == coordinate[1]:
-                score += 2
-        # Increment score for moving
+    # Check if Pete is on spin square, and randomly move him in a direction
+    if peteX == spinX and peteY == spinY:
+        x_movement = randint(-1, 1)
+        y_movement = randint(-1, 1)
+        peteX += x_movement * 40
+        peteY += y_movement * 40
         score += 1
-    # Move up
-    #   If user clicks above Pete in the same column, move Pete up one square
-    elif clickX >= peteLowerX and clickX <= peteUpperX and clickY < peteLowerY:
-        peteY -= 40
-        # If Pete crossed a sensor border, add a penalty of 2
-        for coordinate in sensors:
-            if peteX == coordinate[0] and (peteY+20) == coordinate[1]:
-                score += 2
-        # Increment score for moving
-        score += 1
-    # Move right
-    #   If user clicks to the right of Pete in the same row, move Pete right one square
-    elif clickY >= peteLowerY and clickY <= peteUpperY and clickX > peteUpperX:
-        peteX += 40
-        # If Pete crossed a sensor border, add a penalty of 2
-        for coordinate in sensors:
-            if (peteX-20) == coordinate[0] and peteY == coordinate[1]:
-                score += 2
-        # Increment score for moving
-        score += 1
-    # Move left
-    #   If user clicks to the left of Pete in the same row, move Pete left one square
-    elif clickY >= peteLowerY and clickY <= peteUpperY and clickX < peteLowerX:
-        peteX -= 40
-        # If Pete crossed a sensor border, add a penalty of 2
-        for coordinate in sensors:
-            if (peteX+20) == coordinate[0] and peteY == coordinate[1]:
-                score += 2
-    # Move up-left
-    elif clickY < peteLowerY and clickX < peteLowerX:
-        peteX -= 40
-        peteY -= 40
-        # If Pete crossed a sensor border, add a penalty of 2
-        for coordinate in sensors:
-            if (peteX+20) == coordinate[0] and peteY == coordinate[1]:
-                score += 2
-    # Move up-right
-    # Move down-left
-    # Move down-right
-        # Increment score for moving
-        score += 1
+        
+    # If not on spin tile, perform a normal action
+    else:
+        # Move Pete left if the user clicks left of him
+        if clickX < peteLowerX:
+            peteX -= 40
+        # Move Pete right if the user clicks to the right of him
+        if clickX > peteUpperX:
+            peteX += 40
+        # Move Pete up if the user clicks above him
+        if clickY < peteLowerY:
+            peteY -= 40
+        # Move Pete down if the user clicks above him
+        if clickY > peteUpperY:
+            peteY += 40
+
     # Define and re-draw Pete rectangle object
     pete = Rectangle(Point(peteX-16, peteY-16), Point(peteX+16, peteY+16))
     pete.setFill("gold")
