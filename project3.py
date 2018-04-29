@@ -361,8 +361,8 @@ def drawFieldPanel():
     end.setOutline("light gray")
     end.draw(field)
     # Create spin square Rectangle
-    spin_x = randint(1, 10) * 40 - 20
-    spin_y = randint(1, 10) * 40 - 20
+    spin_x = randint(2, 9) * 40 - 20
+    spin_y = randint(2, 9) * 40 - 20
     spin_square = Rectangle(Point(spin_x-17, spin_y-17), Point(spin_x+17, spin_y+17))
     spin_square.setFill("blue")
     spin_square.draw(field)
@@ -531,35 +531,6 @@ def checkSensor(direction, sensors, score, peteX, peteY):
         pass
     return score
 
-# Check for edges of the screen
-def checkLeft(pete_center):
-    peteX, peteY = clickCoords(pete_center)
-    if peteX - 20 == 0:
-        return True
-    else:
-        return False
-
-def checkUp(pete_center):
-    peteX, peteY = clickCoords(pete_center)
-    if peteY - 20 == 0:
-        return True
-    else:
-        return False
-
-def checkRight(pete_center):
-    peteX, peteY = clickCoords(pete_center)
-    if peteX + 20 == 400:
-        return True
-    else:
-        return False
-
-def checkDown(pete_center):
-    peteX, peteY = clickCoords(pete_center)
-    if peteY + 20 == 400:
-        return True
-    else:
-        return False
-
 # ===========================[ FIELD METHODS ]=================================
 
 
@@ -581,14 +552,11 @@ def movePete(pete, field, x, y, score, sensors, spin_square):
     # Check if Pete is on spin square, and randomly move him in a direction
     #   that is not a wall
     if peteX == spinX and peteY == spinY:
-        while True:
-            direction = {'-1,-1':'up,left', '-1,0':'left', '-1,1':'down,left',
-            '0,-1':'up', '0,0':'none', '0,1':'down',
-            '1,-1':'up,right', '1,0':'right', '1,1':'down,right'}
-            x_movement = randint(-1, 1)
-            y_movement = randint(-1, 1)
-            if direction[str(x_movement) + "," + str(y_movement)] == 'up,left' or direction[str(x_movement) + "," + str(y_movement)] == 'left':
-                print("check_left")
+        direction = {'-1,-1':'up,left', '-1,0':'left', '-1,1':'down,left',
+        '0,-1':'up', '0,0':'none', '0,1':'down',
+        '1,-1':'up,right', '1,0':'right', '1,1':'down,right'}
+        x_movement = randint(-1, 1)
+        y_movement = randint(-1, 1)
         peteX += x_movement * 40
         peteY += y_movement * 40
         direction_key = str(x_movement) + "," + str(y_movement)
