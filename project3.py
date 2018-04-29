@@ -39,7 +39,7 @@ def main():
         # Check if user clicked "Exit" button
         close = checkExit(panel, x, y)
 
-        # Change scores each 500 loops
+        # Change score in top score box every second
         second = datetime.now().second
         if second != None and second > check_second:
             changeScores(scores, score_text)
@@ -70,6 +70,7 @@ def main():
                         in_game = False
                     player_name_text, player_name_entry, phase = drawNewPlayerPanel(
                         new_player_text, score_box, score_text, game_panel, phase)
+
             # Whenever the user presses the reset button, close the game and
             #    draw Initial panel
             if checkResetButton(panel, phase, x, y) is True:
@@ -187,8 +188,6 @@ def drawPlayerNameEntry(game_panel):
     return player_name_text, player_name_entry
 
 # Define drawPlayerNameDisplay() function
-
-
 def drawPlayerNameDisplay(player_name_entry, game_panel):
     # Takes player name from entry box and creates Text object with it
     player_name = player_name_entry.getText()
@@ -200,16 +199,12 @@ def drawPlayerNameDisplay(player_name_entry, game_panel):
     return player_name_display, player_name
 
 # Define undrawPlayerNameDisplay() function
-
-
 def undrawPlayerNameDisplay(player_name_text, player_name_display):
     # Undraws player name Text objects
     player_name_text.undraw()
     player_name_display.undraw()
 
 # Define drawCurrentScore() function
-
-
 def drawCurrentScore(game_panel, score):
     # Draws and decorates score Text objects
     current_score_text = Text(Point(102, 120), "Score:")
@@ -224,16 +219,12 @@ def drawCurrentScore(game_panel, score):
     return current_score_text, current_score_display
 
 # Define undrawCurrentScore() function
-
-
 def undrawCurrentScore(current_score_text, current_score_display):
     # Undraws score Text objects
     current_score_text.undraw()
     current_score_display.undraw()
 
 # Define drawResetButton() function
-
-
 def drawResetButton(game_panel):
     # Creates yellow reset button to create new game with same player
     reset_button = Rectangle(Point(0, 260), Point(50, 300))
@@ -246,16 +237,12 @@ def drawResetButton(game_panel):
     return reset_button, reset_text
 
 # Define undrawResetButton() function
-
-
 def undrawResetButton(reset_button, reset_text):
     # Undraws the reset button
     reset_button.undraw()
     reset_text.undraw()
 
 # Define drawSensors() function
-
-
 def drawSensors(field):
     # Set initial coordinates to potentially draw sensors and empty list
     #   of sensor locations
@@ -269,6 +256,7 @@ def drawSensors(field):
             # Create random number between 0 and 1
             h_chance_border = random()
             v_chance_border = random()
+
             # Creates 40% chance horizontal sensor will be drawn
             if h_chance_border >= 0.6:
                 # Define, draw, and append location of sensor
@@ -279,6 +267,7 @@ def drawSensors(field):
                 h_x = horizontal_sensor.getCenter().getX()
                 h_y = horizontal_sensor.getCenter().getY()
                 sensors.append([h_x, h_y])
+
             # Creates 40% chance horizontal sensor will be drawn
             if v_chance_border >= 0.6:
                 # Define, draw, and append location of sensor
@@ -289,6 +278,7 @@ def drawSensors(field):
                 v_x = vertical_sensor.getCenter().getX()
                 v_y = vertical_sensor.getCenter().getY()
                 sensors.append([v_x, v_y])
+
             # Move to next row
             y += 40
         # Set back to first row after finishing final row
@@ -324,8 +314,6 @@ def drawNewPlayerPanel(new_player_text, score_box, score_text, game_panel, phase
     return player_name_text, player_name_entry, phase
 
 # Define DrawInGamePanel() function
-
-
 def drawInGamePanel(new_player_text, player_name_entry, game_panel, score):
     # Set green button text to "NEW PLAYER", finalize player name, creat reset button,
     #   and draw score display
@@ -341,8 +329,6 @@ def drawInGamePanel(new_player_text, player_name_entry, game_panel, score):
     return player_name_display, player_name, reset_button, reset_text, current_score_text, current_score_display, phase
 
 # Define DrawResetPanel()
-
-
 def drawResetPanel(reset, game_panel, reset_button, reset_text, current_score_text, current_score_display, player_name_text, player_name_display):
     # Remove reset button, set back to inital phase
     #   * Game panel phase not set to inital because drawInitialPanel() is called
@@ -354,8 +340,6 @@ def drawResetPanel(reset, game_panel, reset_button, reset_text, current_score_te
     return new_player_text, score_box, score_text, phase
 
 # Define fieldPanel() function
-
-
 def drawFieldPanel():
     # Create Field panel
     field = GraphWin("The Field", 400, 400)
@@ -427,6 +411,7 @@ def getClick(game_panel, field, in_game):
 
 # ================================[ CHECKS }==================================
 
+
 # Define checkPanel() function
 def checkPanel(game_panel, field):
     # Until a click occurs, check panels for a click
@@ -466,8 +451,6 @@ def checkResetButton(panel, phase, x, y):
         return False
 
 # Define checkWinGame() function
-
-
 def checkWinGame(pete_center):
     # If Pete Rectangle is located in the center of the red Rectangle that
     #   represents the goal, return True
@@ -478,32 +461,75 @@ def checkWinGame(pete_center):
         return False
 
 # Define checkSensor() function
-def checkSensor(direction, sensors, score, peteX, peteY): # Checks if Pete crossed a sensor
-    # Check if Pete crossed a sensor moving up
+def checkSensor(direction, sensors, score, peteX, peteY):
+    coordinate = [peteX, peteY]
     if direction == "up":
-        for sensor in sensors:
-            if sensor[0] == peteX and sensor[1] == peteY + 20:
-                score += 2
-    # Check if Pete crossed a sensor moving down
+        if [coordinate[0], coordinate[1] + 20] in sensors:
+            score += 3
+        else:
+            score += 1
     if direction == "down":
-        for sensor in sensors:
-            if sensor[0] == peteX and sensor[1] == peteY - 20:
-                score += 2
-    # Check if Pete crossed a sensor moving left
+        if [coordinate[0], coordinate[1] - 20] in sensors:
+            score += 3
+        else:
+            score += 1
     if direction == "left":
-        for sensor in sensors:
-            if sensor[0] == peteX + 20 and sensor[1] == peteY:
-                score += 2
-    # Check if Pete crossed a sensor moving right
+        if [coordinate[0] + 20, coordinate[1]] in sensors:
+            score += 3
+        else:
+            score += 1
     if direction == "right":
-        for sensor in sensors:
-            if sensor[0] == peteX - 20 and sensor[1] == peteY:
-                score += 2
+        if [coordinate[0] - 20, coordinate[1]] in sensors:
+            score += 3
+        else:
+            score += 1
+    if direction == "up,left":
+        if [coordinate[0], coordinate[1] + 20] in sensors:
+            score += 3
+        if [coordinate[0] + 20, coordinate[1]] in sensors:
+            score += 3
+        if [coordinate[0] + 20, coordinate[1] + 40] in sensors:
+            score += 3
+        if [coordinate[0] + 40, coordinate[1] + 20] in sensors:
+            score += 3
+        if [coordinate[0], coordinate[1] + 20] not in sensors and [coordinate[0] + 20, coordinate[1]] not in sensors and [coordinate[0] + 20, coordinate[1] + 40] not in sensors and [coordinate[0] + 40, coordinate[1] + 20] not in sensors:
+            score += 1
+    if direction == "up,right":
+        if [coordinate[0], coordinate[1] + 20] in sensors:
+            score += 3
+        if [coordinate[0] - 20, coordinate[1]] in sensors:
+            score += 3
+        if [coordinate[0] - 20, coordinate[1] + 40] in sensors:
+            score += 3
+        if [coordinate[0] - 40, coordinate[1] + 20] in sensors:
+            score += 3
+        if [coordinate[0], coordinate[1] + 20] not in sensors and [coordinate[0] - 20, coordinate[1]] not in sensors and [coordinate[0] - 20, coordinate[1] + 40] not in sensors and [coordinate[0] - 40, coordinate[1] + 20] not in sensors:
+            score += 1
+    if direction == "down,left":
+        if [coordinate[0], coordinate[1] - 20] in sensors:
+            score += 3
+        if [coordinate[0] + 20, coordinate[1]] in sensors:
+            score += 3
+        if [coordinate[0] + 20, coordinate[1] - 40] in sensors:
+            score += 3
+        if [coordinate[0] + 40, coordinate[1] - 20] in sensors:
+            score += 3
+        if [coordinate[0], coordinate[1] - 20] not in sensors and [coordinate[0] + 20, coordinate[1]] not in sensors and [coordinate[0] + 20, coordinate[1] - 40] not in sensors and [coordinate[0] + 40, coordinate[1] - 20] not in sensors:
+            score += 1
+    if direction == "down,right":
+        if [coordinate[0], coordinate[1] - 20] in sensors:
+            score += 3
+        if [coordinate[0] - 20, coordinate[1]] in sensors:
+            score += 3
+        if [coordinate[0] - 20, coordinate[1] - 40] in sensors:
+            score += 3
+        if [coordinate[0] - 40, coordinate[1] - 20] in sensors:
+            score += 3
+        if [coordinate[0], coordinate[1] - 20] not in sensors and [coordinate[0] - 20, coordinate[1]] not in sensors and [coordinate[0] - 20, coordinate[1] - 40] not in sensors and [coordinate[0] - 40, coordinate[1] - 20] not in sensors:
+            score += 1
     if direction == "none":
         pass
-    # Return score
     return score
-
 
 # Check for edges of the screen
 def checkLeft(pete_center):
@@ -536,9 +562,9 @@ def checkDown(pete_center):
 
 # ===========================[ FIELD METHODS ]=================================
 
+
 # Define movePete() function
 def movePete(pete, field, x, y, score, sensors, spin_square):
-
     # Find the location of Pete and spin square, and derive the edges of Pete
     pete_center = pete.getCenter()
     clickX = x
@@ -546,51 +572,50 @@ def movePete(pete, field, x, y, score, sensors, spin_square):
     peteX, peteY = clickCoords(pete_center)
     spinX, spinY = clickCoords(spin_square.getCenter())
     # Define bounds of Pete object
-    peteUpperX = peteX+20
-    peteLowerX = peteX-20
-    peteUpperY = peteY+20
-    peteLowerY = peteY-20
-
+    peteUpperX = peteX + 20
+    peteLowerX = peteX - 20
+    peteUpperY = peteY + 20
+    peteLowerY = peteY - 20
     # Undraw Pete object so it can be re-drawn
     pete.undraw()
-
     # Check if Pete is on spin square, and randomly move him in a direction
-    """direction = {[-1, -1]:"left,up", [-1, 0]:"left", [-1, 1]:"left,down",
-    [0, -1]:"up", [0, 0]:"none", [-1, 1]:"down",
-    [1, -1]:"right,up", [1, 0]:"right", [1, 1]:"right,down"}"""
+    #   that is not a wall
     if peteX == spinX and peteY == spinY:
-        x_movement = randint(-1, 1)
-        y_movement = randint(-1, 1)
+        while True:
+            direction = {'-1,-1':'up,left', '-1,0':'left', '-1,1':'down,left',
+            '0,-1':'up', '0,0':'none', '0,1':'down',
+            '1,-1':'up,right', '1,0':'right', '1,1':'down,right'}
+            x_movement = randint(-1, 1)
+            y_movement = randint(-1, 1)
+            if direction[str(x_movement) + "," + str(y_movement)] == 'up,left' or direction[str(x_movement) + "," + str(y_movement)] == 'left':
+                print("check_left")
         peteX += x_movement * 40
         peteY += y_movement * 40
-        """direction_key = [x_movement, y_movement]
+        direction_key = str(x_movement) + "," + str(y_movement)
         direction_value = direction[direction_key]
-        sensorCheckDirections = direction_value.split(",")
-        for direction in sensorCheckDirections:
-            score = checkSensor(direction, sensors, score, peteX, peteY)
-        score += 1"""
-
+        score = checkSensor(direction_value, sensors, score, peteX, peteY)
     # If not on spin tile, perform a normal action
     else:
-        # Move Pete left if the user clicks left of him
-        if clickX < peteLowerX:
-            peteX -= 40
-            score = checkSensor("left", sensors, score, peteX, peteY)
-        # Move Pete right if the user clicks to the right of him
-        if clickX > peteUpperX:
-            peteX += 40
-            score = checkSensor("right", sensors, score, peteX, peteY)
+        # Create list of directions
+        direction = []
         # Move Pete up if the user clicks above him
         if clickY < peteLowerY:
             peteY -= 40
-            score = checkSensor("up", sensors, score, peteX, peteY)
+            direction.append("up")
         # Move Pete down if the user clicks below him
         if clickY > peteUpperY:
             peteY += 40
-            score = checkSensor("down", sensors, score, peteX, peteY)
-
-        # Add one to score for moving
-        score += 1
+            direction.append("down")
+        # Move Pete left if the user clicks left of him
+        if clickX < peteLowerX:
+            peteX -= 40
+            direction.append("left")
+        # Move Pete right if the user clicks to the right of him
+        if clickX > peteUpperX:
+            peteX += 40
+            direction.append("right")
+        direction = ",".join(direction)
+        score = checkSensor(direction, sensors, score, peteX, peteY)
 
     # Define and re-draw Pete Rectangle object
     pete = Rectangle(Point(peteX-16, peteY-16), Point(peteX+16, peteY+16))
@@ -601,7 +626,6 @@ def movePete(pete, field, x, y, score, sensors, spin_square):
     # Return objects
     return pete, pete_center, score
 
-
 # Define updateScore() function
 def updateScore(current_score_text, current_score_display, game_panel, score):
     # Update score by re-drawing objects
@@ -609,7 +633,6 @@ def updateScore(current_score_text, current_score_display, game_panel, score):
     current_score_text, current_score_display = drawCurrentScore(game_panel, score)
     # Return objects
     return current_score_text, current_score_display
-
 
 # Define endGame() function
 def endGame(field, game_panel, player_name, score):
@@ -639,7 +662,6 @@ def writeScores(name, score):
     # Close text file
     score_file.close()
 
-
 # Define readScores() function
 def readScores():
     # Create empty list of top scores
@@ -659,7 +681,6 @@ def readScores():
     top_scores.sort(key=lambda s: s[1])
     # Return top scores in list form
     return top_scores
-
 
 # Define changeScores() function
 def changeScores(scores, score_text):
