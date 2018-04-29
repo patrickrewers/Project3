@@ -25,7 +25,7 @@ def main():
     close = False
     in_game = False
     score = 0
-    # Create dummy variables to prevent errors before officially defined
+    # Create dummy variables to prevent errors when calling function
     field = ""
     check_second = datetime.now().second
 
@@ -53,18 +53,19 @@ def main():
             # Whenever user presses the green button, change the game mode
             if checkGreenButton(panel, x, y) is True:
 
-                # Clicks in Initial panel change panel to New Player
+                # Clicking during Initial phase changes panel to New Player
+                #   phase
                 if phase == "initial":
                     player_name_text, player_name_entry, phase = drawNewPlayerPanel(
                         new_player_text, score_box, score_text, game_panel, phase)
 
-                # Clicks in New Player panel launch the game
+                # Clicking during New Player phase launches the game
                 elif phase == "new_player":
                     in_game = True
                     player_name_display, player_name, reset_button, reset_text, current_score_text, current_score_display, phase = drawInGamePanel(new_player_text, player_name_entry, game_panel, score)
                     field, pete, sensors, spin_square,blackcenter1, blackcenter2,goodsensors = drawFieldPanel()
 
-                # Clicks while in game close the game and revert panel to New
+                # Clicking while in game close the game and reverts panel to New
                 #   Player panel
                 elif phase == "in_game":
                     if in_game is True:
@@ -86,8 +87,10 @@ def main():
 
         # Check if user clicked in field panel
         if panel == "field":
+
             # Move pete based on click
             pete, pete_center, score = movePete(pete, field, x, y, score, sensors, spin_square, blackcenter1, blackcenter2, goodsensors)
+
             # Update score with every click during game
             if phase == "in_game":
                 # If score is less than 0 (crossing good sensor with a score of
@@ -95,6 +98,7 @@ def main():
                 if score < 0:
                     score = 0
                 current_score_text, current_score_display = updateScore(current_score_text, current_score_display, game_panel, score)
+
             # Check if user won game, and set close to the result
             if checkWinGame(pete_center) is True:
                 close = endGame(field, game_panel, player_name, score)
@@ -173,7 +177,6 @@ def drawScoreDisplay(game_panel):
     return (score_box, score_text, scores)
 
 # Define drawPlayerText() function
-
 def drawPlayerText(game_panel):
     # Create and stylize "NEW PLAYER" text over green button
     new_player_text = Text(Point(150, 281), "NEW PLAYER")
@@ -429,7 +432,7 @@ def drawFieldPanel():
     end.draw(field)
 
     # Draw black holes
-    blackcenter1, blackcenter2 = blackholes(field)
+    blackcenter1, blackcenter2 = blackHoles(field)
 
     # Create spin square Rectangle
     while True:
@@ -763,9 +766,9 @@ def movePete(pete, field, x, y, score, sensors, spin_square,blackcenter1, blackc
     # Return the center of Pete so the victory condition can be checked
     pete_center = pete.getCenter()
 
-    #Get the center of Pete
+    # Get the center of Pete
     petecenter=pete.getCenter()
-    #If center of Pete matches blackcenter1, move him to blackcenter2
+    # If center of Pete matches blackcenter1, move him to blackcenter2
     if petecenter.getX()==blackcenter1.getX() and petecenter.getY()==blackcenter1.getY():
         pete.undraw()
         petecenter=blackcenter2
@@ -773,7 +776,7 @@ def movePete(pete, field, x, y, score, sensors, spin_square,blackcenter1, blackc
         pete.setFill('gold')
         pete.draw(field)
 
-    #If center of Pete matches blackcenter2, move him to blackcenter1
+    # If center of Pete matches blackcenter2, move him to blackcenter1
     elif petecenter.getX()==blackcenter2.getX() and petecenter.getY()==blackcenter2.getY():
         pete.undraw()
         petecenter=blackcenter1
@@ -800,7 +803,7 @@ def endGame(field, game_panel, player_name, score):
     end_game_text.draw(field)
 
     # Draw graphic objects at different places that represent balloons with a
-    # string connected to it.
+    #   string connected to it.
     balloon_1 = Circle(Point(145,110),18)
     balloon_1.setFill("red")
     balloon_1.setOutline("red")
@@ -835,7 +838,7 @@ def endGame(field, game_panel, player_name, score):
     string_3.draw(field)
 
     # Create a while loop that moves the objets every 0.05 seconds upwards to
-    # make it appear as if they are floating
+    #   make it appear as if they are floating
     while True:
         sleep(0.05)
         balloon_1.move(0,-10)
@@ -849,7 +852,7 @@ def endGame(field, game_panel, player_name, score):
         string_3.move(0,-10)
 
         # If a click is detetced in the field, the window will close even if the
-        # balloons are still moving in the while loop
+        #   balloons are still moving in the while loop
         click = field.checkMouse()
         if click != None:
             break
@@ -902,30 +905,35 @@ def changeScores(scores, score_text):
     scores.append(scores.pop(2))
     score_text.setText("\n".join(scores[:6]))
 
-# Define blackholes() function
-def blackholes(field):
-    #create a list of numbers that could be X and Y coordinates
+# Define blackHoles() function
+def blackHoles(field):
+
+    # Create a list of numbers that could be X and Y coordinates
     numbers=[]
     for i in range (60,360,40):
         numbers.append(i)
-    #From that list, select a pair to be the location of the black holes
-    #Create first blackhole coordinates
+
+    # From that list, ceate first blackhole coordinates
     blackX1=int(choice(numbers))
     blackY1=int(choice(numbers))
-    #Create second blackhole coordinates
+
+    # Create second blackhole coordinates
     blackX2=int(choice(numbers))
     blackY2=int(choice(numbers))
-    #Draw black holes
+
+    # Draw the black holes
     black1=Circle(Point(blackX1,blackY1), 5)
     black1.setFill('black')
     black1.draw(field)
     black2=Circle(Point(blackX2,blackY2), 5)
     black2.setFill('black')
     black2.draw(field)
-    #Get the centers of the circles and return them
+
+    # Get the centers of the circles
     blackcenter1=black1.getCenter()
     blackcenter2=black2.getCenter()
 
+    # Return the center locations for the black holes
     return blackcenter1, blackcenter2
 
 # ==============================[ CALL MAIN }==================================
